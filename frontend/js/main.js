@@ -11,10 +11,27 @@ function setupEventListeners() {
 
     // --- Navigation ---
     document.getElementById('nav-logo').addEventListener('click', () => window.location.reload());
-    document.getElementById('nav-login').addEventListener('click', (e) => {
-        e.target.innerText = "Sahil";
-        showToast("Welcome back, Sahil!", 'success');
-    });
+    // --- Navigation & Auth ---
+    document.getElementById('nav-logo').addEventListener('click', () => window.location.reload());
+
+    // Check Auth State
+    checkAuthState();
+
+    const loginBtn = document.getElementById('nav-login');
+    if (loginBtn) {
+        loginBtn.addEventListener('click', () => {
+            window.location.href = 'login.html';
+        });
+    }
+
+    const logoutBtn = document.getElementById('nav-logout');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('studyBuddyUser');
+            showToast('Logged out successfully', 'info');
+            setTimeout(() => checkAuthState(), 500);
+        });
+    }
 
     // --- Summary Tool ---
     const btnSummary = document.getElementById('btn-generate-summary');
@@ -112,5 +129,24 @@ function setLoading(btn, isLoading, text) {
         btn.disabled = false;
         btn.innerHTML = text;
         btn.classList.remove('opacity-75', 'cursor-not-allowed');
+    }
+}
+
+function checkAuthState() {
+    const userStr = localStorage.getItem('studyBuddyUser');
+    const loginBtn = document.getElementById('nav-login');
+    const userMenu = document.getElementById('user-menu');
+    const userNameSpan = document.getElementById('user-name');
+
+    if (userStr) {
+        const user = JSON.parse(userStr);
+        if (loginBtn) loginBtn.classList.add('hidden');
+        if (userMenu) {
+            userMenu.classList.remove('hidden');
+            userNameSpan.innerText = `Hi, ${user.name}`;
+        }
+    } else {
+        if (loginBtn) loginBtn.classList.remove('hidden');
+        if (userMenu) userMenu.classList.add('hidden');
     }
 }
