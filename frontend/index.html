@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Study Buddy - Your Intelligent Learning Companion</title>
+    <meta name="description" content="AI-powered study tool for summaries, flashcards, and practice quizzes.">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,7 +15,7 @@
         rel="stylesheet">
 
     <!-- Styles -->
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 
 <body>
@@ -23,286 +24,227 @@
     <div class="background-overlay"></div>
     <div class="particles"></div>
 
+    <!-- ==================== TOAST NOTIFICATIONS ==================== -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2"></div>
+
     <!-- ==================== NAVIGATION ==================== -->
-    <nav class="navbar glass-panel">
+    <nav class="navbar relative z-50">
         <div class="container flex justify-between items-center h-full">
-            <div class="logo flex items-center gap-2 cursor-pointer" id="nav-logo">
-                <div class="logo-icon text-2xl">🎓</div>
+            <div class="logo flex items-center gap-3 cursor-pointer" id="nav-logo">
+                <div class="logo-icon text-2xl animate-float">🤖</div>
                 <span class="font-heading font-bold text-xl tracking-tight">Study Buddy</span>
             </div>
 
             <div class="nav-links flex gap-8 hidden md:flex">
-                <button class="nav-link" id="nav-summ">Summarize</button>
-                <button class="nav-link" id="nav-flash">Flashcards</button>
-                <button class="nav-link" id="nav-prac">Practice</button>
+                <a href="#" class="nav-link text-sm">Home</a>
+                <a href="#" class="nav-link text-sm">Features</a>
+                <a href="#" class="nav-link text-sm">Contact</a>
             </div>
 
             <div class="flex gap-4">
-                <button id="nav-cta" class="btn btn-primary btn-sm glow-blue">Get Started</button>
+                <button id="nav-login"
+                    class="btn btn-outline btn-sm rounded-full px-6 border-blue-500/50 hover:bg-blue-500/10">Log
+                    In</button>
             </div>
         </div>
     </nav>
 
-    <!-- ==================== AUTH VIEW (Modal Style) ==================== -->
-    <div id="auth-view"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden fade-in">
-        <div class="glass-panel p-8 w-full max-w-sm relative glowing-border">
-            <button id="close-auth"
-                class="absolute top-4 right-4 text-muted hover:text-white transition-colors">✕</button>
+    <!-- ==================== HERO DASHBOARD ==================== -->
+    <main id="app-view" class="container relative z-10 pt-20 pb-12 min-h-screen flex flex-col justify-center">
 
-            <div class="text-center mb-8">
-                <h2 class="mb-2 text-2xl">Welcome Back</h2>
-                <p class="text-sm text-muted">Login to save your progress</p>
-            </div>
-
-            <!-- Login Form -->
-            <form id="login-form" class="flex flex-col gap-4">
-                <div>
-                    <label class="block mb-2 text-xs uppercase tracking-wider text-muted font-bold">Email</label>
-                    <input type="email" placeholder="student@example.com" required class="glass-input">
-                </div>
-                <div>
-                    <label class="block mb-2 text-xs uppercase tracking-wider text-muted font-bold">Password</label>
-                    <input type="password" placeholder="••••••••" required class="glass-input">
-                </div>
-                <button type="submit" class="btn btn-primary w-full mt-4 glow-purple">Login</button>
-            </form>
-            <p class="text-center mt-6 text-xs text-muted">
-                Don't have an account? <a href="#" class="text-primary-purple hover:underline">Sign up</a>
+        <!-- Header -->
+        <div class="text-center mb-16 relative fade-in">
+            <h1 class="hero-title mb-6 text-5xl md:text-6xl font-bold tracking-tight">
+                <span class="block text-white mb-2">Your AI Learning Companion</span>
+            </h1>
+            <p class="text-lg text-muted/80 max-w-2xl mx-auto font-light leading-relaxed">
+                Upload your study materials and let Study Buddy summarize notes, create flashcards,
+                and generate practice questions instantly.
             </p>
-        </div>
-    </div>
 
-    <!-- ==================== MAIN CONTENT ==================== -->
-    <main id="app-view" class="container relative z-10 pt-32 pb-12 min-h-screen flex flex-col">
-
-        <!-- 1. HERO SECTION (Home) -->
-        <section id="home-section" class="flex-1 flex flex-col items-center justify-center text-center fade-in">
-
-            <div class="hero-content max-w-4xl mb-20 relative">
-                <!-- Ambient Glow behind title -->
-                <div
-                    class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-purple-500/20 blur-[100px] rounded-full pointer-events-none">
-                </div>
-
-                <!-- Title -->
-                <h1 class="hero-title mb-6 relative z-10">
-                    <span class="block text-white mb-2">Your AI Study</span>
-                    <span class="text-gradient-main">Companion</span>
-                </h1>
-
-                <!-- Subtitle -->
-                <p class="text-xl text-muted mb-10 max-w-2xl mx-auto relative z-10">
-                    Upload your study material and let our AI generate summaries, flashcards, and practice questions for
-                    you.
-                </p>
-
-                <!-- CTA -->
-                <button id="hero-cta" class="btn btn-primary btn-lg glow-blue relative z-10">Get Started</button>
-            </div>
-
-            <!-- Feature Cards Grid -->
-            <div class="grid-3 w-full gap-8">
-
-                <!-- Card 1: Summary -->
-                <div class="feature-card glass-card group">
-                    <div class="card-glow glow-cyan"></div>
-                    <div
-                        class="card-icon text-cyan-400 mb-6 p-4 rounded-full bg-cyan-900/20 group-hover:bg-cyan-500/20 transition-colors">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                            <line x1="16" y1="13" x2="8" y2="13"></line>
-                            <line x1="16" y1="17" x2="8" y2="17"></line>
-                            <polyline points="10 9 9 9 8 9"></polyline>
-                        </svg>
-                    </div>
-                    <h3 class="mb-3 text-xl">Generate Summaries</h3>
-                    <p class="text-sm text-muted mb-8 leading-relaxed">Get concise AI-generated summaries of your notes
-                        instantly.</p>
-                    <button
-                        class="btn btn-outline w-full group-hover:bg-cyan-500/10 group-hover:border-cyan-500/50 transition-all"
-                        onclick="navigateTo('summary')">Summarize</button>
-                </div>
-
-                <!-- Card 2: Flashcards -->
-                <div class="feature-card glass-card group">
-                    <div class="card-glow glow-purple"></div>
-                    <div
-                        class="card-icon text-purple-400 mb-6 p-4 rounded-full bg-purple-900/20 group-hover:bg-purple-500/20 transition-colors">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="mb-3 text-xl">Create Flashcards</h3>
-                    <p class="text-sm text-muted mb-8 leading-relaxed">Turn your notes into interactive flashcards for
-                        active recall.</p>
-                    <button
-                        class="btn btn-outline w-full group-hover:bg-purple-500/10 group-hover:border-purple-500/50 transition-all"
-                        onclick="navigateTo('flashcards')">Create</button>
-                </div>
-
-                <!-- Card 3: Practice -->
-                <div class="feature-card glass-card group">
-                    <div class="card-glow glow-blue"></div>
-                    <div
-                        class="card-icon text-blue-400 mb-6 p-4 rounded-full bg-blue-900/20 group-hover:bg-blue-500/20 transition-colors">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <line x1="12" y1="8" x2="12" y2="12"></line>
-                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                        </svg>
-                    </div>
-                    <h3 class="mb-3 text-xl">Practice Mode</h3>
-                    <p class="text-sm text-muted mb-8 leading-relaxed">Test your knowledge with AI-generated questions
-                        and quizzes.</p>
-                    <button
-                        class="btn btn-outline w-full group-hover:bg-blue-500/10 group-hover:border-blue-500/50 transition-all"
-                        onclick="navigateTo('practice')">Practice</button>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- 2. TOOL SECTIONS (Hidden by default) -->
-
-        <!-- Summary Tool -->
-        <section id="summary-section" class="tool-section hidden fade-in w-full max-w-5xl mx-auto relative">
-            <div class="section-glow bg-cyan-500/20"></div>
-
-            <header class="mb-10 text-center relative z-10">
-                <div class="inline-flex items-center justify-center p-3 rounded-full bg-cyan-500/10 mb-4 text-cyan-400">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
+            <div class="flex justify-center gap-4 mt-10">
+                <button
+                    class="btn btn-primary px-8 py-3 rounded-full bg-gradient-to-r from-blue-600 to-blue-400 shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all">Get
+                    Started</button>
+                <button
+                    class="btn btn-outline px-8 py-3 rounded-full border-white/10 hover:bg-white/5 flex items-center gap-2">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7z" />
                     </svg>
-                </div>
-                <h2 class="text-3xl mb-2 text-gradient-cyan">Smart Summary</h2>
-                <button class="btn btn-ghost btn-sm mt-2 text-muted hover:text-white" onclick="navigateTo('home')">←
-                    Back to Home</button>
-            </header>
+                    Watch Demo
+                </button>
+            </div>
+        </div>
 
-            <div class="glass-panel p-8 mb-8 relative z-10 border-cyan-500/20">
-                <textarea id="summary-input" class="glass-input w-full text-lg min-h-[200px]"
-                    placeholder="Paste your study material here and witness the magic..."></textarea>
-                <div class="flex justify-between items-center mt-6 pt-6 border-t border-white/5">
-                    <span id="summary-word-count" class="text-sm text-muted">0 words</span>
-                    <button id="btn-generate-summary" class="btn btn-primary glow-cyan px-8 py-3">Generate
+        <!-- Dashboard Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-7xl mx-auto items-stretch fade-in"
+            style="animation-delay: 0.2s;">
+
+            <!-- Card 1: Smart Summary -->
+            <div
+                class="glass-card p-0 flex flex-col h-full border-cyan-500/30 hover:border-cyan-400/50 group overflow-hidden">
+                <div class="p-6 border-b border-white/5 bg-gradient-to-r from-cyan-900/20 to-transparent">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="p-2 rounded-lg bg-cyan-500/20 text-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.3)]">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path
+                                    d="M12 2a10 10 0 1 0 10 10 10 10 0 0 0-10-10zm0 14a1 1 0 1 1 1-1 1 1 0 0 1-1 1zm1-4a1 1 0 0 1-2 0V9a1 1 0 0 1 2 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Smart Summary</h3>
+                    </div>
+                    <p class="text-xs text-muted/60 pl-11">Get AI-generated summaries instantly.</p>
+                </div>
+
+                <div class="p-6 flex-1 flex flex-col">
+                    <textarea id="summary-input"
+                        class="glass-input flex-1 w-full bg-black/20 border-white/10 text-sm resize-none rounded-xl mb-4 focus:border-cyan-500/50 min-h-[180px]"
+                        placeholder="Paste your study notes..."></textarea>
+                    <button id="btn-generate-summary"
+                        class="btn w-full py-3 rounded-xl bg-gradient-to-r from-cyan-600/80 to-blue-600/80 hover:from-cyan-500 hover:to-blue-500 border border-white/10 shadow-lg shadow-cyan-900/50">Generate
                         Summary</button>
                 </div>
-            </div>
 
-            <div id="summary-output-panel"
-                class="glass-panel p-10 bg-black/40 min-h-[100px] hidden relative z-10 fade-in border-cyan-500/30">
-                <!-- Results injected here -->
-            </div>
-        </section>
-
-        <!-- Flashcards Tool -->
-        <section id="flashcards-section" class="tool-section hidden fade-in w-full max-w-5xl mx-auto relative">
-            <div class="section-glow bg-purple-500/20"></div>
-
-            <header class="mb-10 text-center relative z-10">
-                <div
-                    class="inline-flex items-center justify-center p-3 rounded-full bg-purple-500/10 mb-4 text-purple-400">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                    </svg>
-                </div>
-                <h2 class="text-3xl mb-2 text-gradient-purple">Flashcard Generator</h2>
-                <button class="btn btn-ghost btn-sm mt-2 text-muted hover:text-white" onclick="navigateTo('home')">←
-                    Back to Home</button>
-            </header>
-
-            <div class="glass-panel p-8 mb-8 relative z-10 border-purple-500/20">
-                <textarea id="flashcard-input" class="glass-input w-full text-lg min-h-[200px]"
-                    placeholder="Paste notes to transform into flashcards..."></textarea>
-                <div class="flex justify-end mt-6 pt-6 border-t border-white/5">
-                    <button id="btn-generate-flashcards" class="btn btn-primary glow-purple px-8 py-3">Create
-                        Deck</button>
+                <!-- Output Overlay -->
+                <div id="summary-output-panel"
+                    class="absolute inset-0 z-20 bg-black/95 p-6 hidden flex-col overflow-y-auto">
+                    <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
+                        <h4 class="text-cyan-400 font-bold">Summary Result</h4>
+                        <button id="close-summary-output" class="text-muted hover:text-white">✕</button>
+                    </div>
+                    <div id="summary-content" class="text-sm text-gray-300 leading-relaxed font-light"></div>
                 </div>
             </div>
 
-            <div id="flashcards-output-panel" class="grid-2 gap-6 relative z-10">
-                <!-- Cards injected here -->
-            </div>
-        </section>
-
-        <!-- Practice Tool -->
-        <section id="practice-section" class="tool-section hidden fade-in w-full max-w-5xl mx-auto relative">
-            <div class="section-glow bg-blue-500/20"></div>
-
-            <header class="mb-10 text-center relative z-10">
-                <div class="inline-flex items-center justify-center p-3 rounded-full bg-blue-500/10 mb-4 text-blue-400">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="8" x2="12" y2="12"></line>
-                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                    </svg>
+            <!-- Card 2: Flashcards -->
+            <div
+                class="glass-card p-0 flex flex-col h-full border-purple-500/30 hover:border-purple-400/50 group overflow-hidden relative">
+                <div class="p-6 border-b border-white/5 bg-gradient-to-r from-purple-900/20 to-transparent">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div
+                            class="p-2 rounded-lg bg-purple-500/20 text-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.3)]">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                                <line x1="8" y1="21" x2="16" y2="21" />
+                                <line x1="12" y1="17" x2="12" y2="21" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Flashcards</h3>
+                    </div>
+                    <p class="text-xs text-muted/60 pl-11">Review terms efficiently.</p>
                 </div>
-                <h2 class="text-3xl mb-2 text-gradient-blue">Practice Quiz</h2>
-                <button class="btn btn-ghost btn-sm mt-2 text-muted hover:text-white" onclick="navigateTo('home')">←
-                    Back to Home</button>
-            </header>
 
-            <div class="glass-panel p-8 mb-8 relative z-10 border-blue-500/20">
-                <textarea id="quiz-input" class="glass-input w-full text-lg min-h-[200px]"
-                    placeholder="Paste content to quiz yourself on..."></textarea>
-                <div class="flex justify-end mt-6 pt-6 border-t border-white/5">
-                    <button id="btn-open-quiz-modal" class="btn btn-primary glow-blue px-8 py-3">Start Quiz</button>
+                <div class="p-6 flex-1 flex flex-col relative justify-center items-center">
+
+                    <!-- Input State -->
+                    <div id="flashcard-input-container" class="w-full h-full flex flex-col">
+                        <textarea id="flashcard-input"
+                            class="glass-input flex-1 w-full bg-black/20 border-white/10 text-sm resize-none rounded-xl mb-4 focus:border-purple-500/50"
+                            placeholder="Paste notes to create deck..."></textarea>
+                        <button id="btn-generate-flashcards"
+                            class="btn w-full py-3 rounded-xl bg-gradient-to-r from-purple-600/80 to-pink-600/80 hover:from-purple-500 hover:to-pink-500 border border-white/10 shadow-lg shadow-purple-900/50">Create
+                            Deck</button>
+                    </div>
+
+                    <!-- Flashcard Viewer (Hidden initially) -->
+                    <div id="flashcards-output-panel" class="hidden w-full h-full flex-col">
+                        <div class="flex justify-end p-2">
+                            <button id="close-flashcards-output"
+                                class="text-muted hover:text-white text-xs uppercase tracking-widest font-bold">Exit</button>
+                        </div>
+                        <div id="flashcard-display"
+                            class="relative w-full flex-1 bg-black/40 border border-white/10 rounded-xl p-6 flex items-center justify-center text-center cursor-pointer hover:border-purple-500/50 transition-all mb-4 group/card">
+                            <!-- Card face rendered by JS -->
+                        </div>
+
+                        <!-- Controls -->
+                        <div class="flex items-center justify-between px-2">
+                            <button id="prev-card"
+                                class="p-2 rounded-full hover:bg-white/10 text-muted hover:text-white">←</button>
+                            <button id="flip-card-btn"
+                                class="px-6 py-2 rounded-full bg-white/5 border border-white/10 text-sm hover:bg-white/10 text-purple-300">Flip</button>
+                            <button id="next-card"
+                                class="p-2 rounded-full hover:bg-white/10 text-muted hover:text-white">→</button>
+                        </div>
+                        <div id="flashcard-counter"
+                            class="text-center mt-2 text-xs text-muted font-mono tracking-widest">1 / 5</div>
+                    </div>
                 </div>
             </div>
 
-            <div id="quiz-output-panel" class="hidden relative z-10">
-                <!-- Quiz injected here -->
-            </div>
-        </section>
+            <!-- Card 3: Practice Mode -->
+            <div
+                class="glass-card p-0 flex flex-col h-full border-blue-500/30 hover:border-blue-400/50 group overflow-hidden">
+                <div class="p-6 border-b border-white/5 bg-gradient-to-r from-blue-900/20 to-transparent">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="p-2 rounded-lg bg-blue-500/20 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                                <line x1="16" y1="13" x2="8" y2="13" />
+                                <line x1="16" y1="17" x2="8" y2="17" />
+                                <polyline points="10 9 9 9 8 9" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Practice Mode</h3>
+                    </div>
+                    <p class="text-xs text-muted/60 pl-11">Test your knowledge.</p>
+                </div>
 
+                <div class="p-6 flex-1 flex flex-col">
+                    <label class="text-xs uppercase text-muted font-bold tracking-wider mb-2">Mode</label>
+                    <div id="quiz-input-container" class="w-full flex flex-col h-full relative z-10">
+                        <textarea id="quiz-input"
+                            class="glass-input flex-1 w-full bg-black/20 border-white/10 text-sm resize-none rounded-xl mb-4 focus:border-blue-500/50 min-h-[100px]"
+                            placeholder="Paste study material for quiz..."></textarea>
+
+                        <div class="flex bg-black/30 rounded-lg p-1 mb-4 border border-white/5">
+                            <button id="opt-questions"
+                                class="flex-1 py-2 text-xs rounded-md bg-blue-600 text-white shadow font-bold transition-all">Questions</button>
+                            <button id="opt-mcq"
+                                class="flex-1 py-2 text-xs rounded-md text-muted hover:text-white transition-all">MCQs</button>
+                            <button id="opt-both"
+                                class="flex-1 py-2 text-xs rounded-md text-muted hover:text-white transition-all">Both</button>
+                        </div>
+
+                        <div class="space-y-4 mb-6">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-400">Number Questions</span>
+                                <input id="num-questions" type="number" value="5"
+                                    class="glass-input w-16 text-center py-1 px-0 h-8 text-sm bg-black/40 border-white/10" />
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-400">Number MCQs</span>
+                                <input id="num-mcq" type="number" value="5"
+                                    class="glass-input w-16 text-center py-1 px-0 h-8 text-sm bg-black/40 border-white/10" />
+                            </div>
+                        </div>
+
+                        <button id="btn-start-quiz"
+                            class="btn w-full py-3 rounded-xl bg-gradient-to-r from-blue-700/80 to-indigo-600/80 hover:from-blue-600 hover:to-indigo-500 border border-white/10 shadow-lg shadow-blue-900/50 mt-auto">Start
+                            Practice</button>
+                    </div>
+
+                    <!-- Quiz Results (Hidden) -->
+                    <div id="quiz-output-panel"
+                        class="hidden absolute inset-0 z-20 bg-black/95 p-6 flex-col overflow-y-auto rounded-xl">
+                        <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
+                            <h4 class="text-blue-400 font-bold">Practice Quiz</h4>
+                            <button id="close-quiz-output" class="text-muted hover:text-white">✕</button>
+                        </div>
+                        <div id="quiz-content" class="space-y-4"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </main>
 
-    <!-- QUIZ MODAL -->
-    <div id="quiz-modal"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md hidden fade-in">
-        <div class="glass-panel p-8 w-full max-w-md relative border-blue-500/30 shadow-[0_0_50px_rgba(59,130,246,0.3)]">
-            <h2 class="mb-6 text-2xl text-center text-gradient-blue">Quiz Options</h2>
-
-            <div class="grid grid-cols-3 gap-3 mb-8">
-                <button id="opt-questions" class="btn btn-outline text-sm py-3">Questions</button>
-                <button id="opt-mcq" class="btn btn-outline text-sm py-3">MCQ</button>
-                <button id="opt-both" class="btn btn-outline text-sm py-3">Both</button>
-            </div>
-
-            <!-- "Both" Options (Hidden by default) -->
-            <div id="both-options"
-                class="hidden flex-col gap-4 mb-8 p-6 glass-card rounded-xl bg-white/5 border border-white/10">
-                <div>
-                    <label class="block mb-2 text-xs uppercase tracking-wider text-muted font-bold">Open-Ended
-                        Questions</label>
-                    <input type="number" id="num-questions" value="5" min="1" max="20" class="glass-input text-center">
-                </div>
-                <div>
-                    <label class="block mb-2 text-xs uppercase tracking-wider text-muted font-bold">Multiple
-                        Choice</label>
-                    <input type="number" id="num-mcq" value="5" min="1" max="20" class="glass-input text-center">
-                </div>
-            </div>
-
-            <div class="flex gap-4">
-                <button id="btn-cancel-quiz" class="btn btn-ghost w-full">Cancel</button>
-                <button id="btn-start-quiz" class="btn btn-primary w-full glow-blue">Start</button>
-            </div>
-        </div>
-    </div>
-
-    <script src="script.js"></script>
+    <!-- Global Scripts -->
+    <script type="module" src="js/main.js"></script>
 </body>
 
 </html>

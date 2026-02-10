@@ -21,91 +21,59 @@ document.addEventListener('DOMContentLoaded', () => {
 function cacheElements() {
     // Nav
     elements.navLogo = document.getElementById('nav-logo');
-    elements.navSumm = document.getElementById('nav-summ');
-    elements.navFlash = document.getElementById('nav-flash');
-    elements.navPrac = document.getElementById('nav-prac');
-    elements.navCta = document.getElementById('nav-cta');
-    elements.heroCta = document.getElementById('hero-cta');
+    elements.navLogin = document.getElementById('nav-login');
 
-    // Sections
-    elements.homeSection = document.getElementById('home-section');
-    elements.summarySection = document.getElementById('summary-section');
-    elements.flashcardsSection = document.getElementById('flashcards-section');
-    elements.practiceSection = document.getElementById('practice-section');
-
-    // Auth
-    elements.authView = document.getElementById('auth-view');
-    elements.closeAuth = document.getElementById('close-auth');
-    elements.loginForm = document.getElementById('login-form');
-
-    // Tools
+    // Summary Tool
     elements.summaryInput = document.getElementById('summary-input');
     elements.btnGenerateSummary = document.getElementById('btn-generate-summary');
     elements.summaryOutputPanel = document.getElementById('summary-output-panel');
-    elements.summaryWordCount = document.getElementById('summary-word-count');
+    elements.summaryContent = document.getElementById('summary-content');
 
+    // Flashcard Tool
     elements.flashcardInput = document.getElementById('flashcard-input');
     elements.btnGenerateFlashcards = document.getElementById('btn-generate-flashcards');
     elements.flashcardsOutputPanel = document.getElementById('flashcards-output-panel');
+    elements.flashcardInputContainer = document.getElementById('flashcard-input-container');
+    elements.flashcardDisplay = document.getElementById('flashcard-display'); // The card itself
+    elements.flipCardBtn = document.getElementById('flip-card-btn');
+    elements.prevCard = document.getElementById('prev-card');
+    elements.nextCard = document.getElementById('next-card');
 
+    // Practice Tool
     elements.quizInput = document.getElementById('quiz-input');
-    elements.btnOpenQuizModal = document.getElementById('btn-open-quiz-modal');
-    elements.quizOutputPanel = document.getElementById('quiz-output-panel');
-
-    // Quiz Modal
-    elements.quizModal = document.getElementById('quiz-modal');
-    elements.optQuestions = document.getElementById('opt-questions');
-    elements.optMcq = document.getElementById('opt-mcq');
-    elements.optBoth = document.getElementById('opt-both');
-    elements.bothOptions = document.getElementById('both-options');
-    elements.btnCancelQuiz = document.getElementById('btn-cancel-quiz');
     elements.btnStartQuiz = document.getElementById('btn-start-quiz');
+    elements.quizInputContainer = document.getElementById('quiz-input-container');
+    elements.quizOutputPanel = document.getElementById('quiz-output-panel');
+    elements.quizContent = document.getElementById('quiz-content');
     elements.numQuestions = document.getElementById('num-questions');
     elements.numMcq = document.getElementById('num-mcq');
 }
 
-function initApp() {
-    setupEventListeners();
-    // Start at home
-    navigateTo('home');
-}
+// No navigation needed in dashboard view
 
-// --- Navigation ---
-function navigateTo(view) {
-    state.currentView = view;
-
-    // Hide all
-    const allSections = [elements.homeSection, elements.summarySection, elements.flashcardsSection, elements.practiceSection];
-    allSections.forEach(el => el.classList.add('hidden'));
-
-    // Show Target
-    if (view === 'home') elements.homeSection.classList.remove('hidden');
-    if (view === 'summary') elements.summarySection.classList.remove('hidden');
-    if (view === 'flashcards') elements.flashcardsSection.classList.remove('hidden');
-    if (view === 'practice') elements.practiceSection.classList.remove('hidden');
-
-    // Scroll to top
-    window.scrollTo(0, 0);
-}
 
 // --- Event Listeners ---
 function setupEventListeners() {
     // Nav
-    elements.navLogo.addEventListener('click', () => navigateTo('home'));
-    if (elements.navSumm) elements.navSumm.addEventListener('click', () => navigateTo('summary'));
-    if (elements.navFlash) elements.navFlash.addEventListener('click', () => navigateTo('flashcards'));
-    if (elements.navPrac) elements.navPrac.addEventListener('click', () => navigateTo('practice'));
+    elements.navLogo.addEventListener('click', () => window.location.reload());
 
-    // CTAs (Auth)
-    elements.navCta.addEventListener('click', openAuth);
-    elements.heroCta.addEventListener('click', openAuth);
-    elements.closeAuth.addEventListener('click', closeAuth);
-    elements.loginForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        closeAuth();
-        elements.navCta.innerText = "Dashboard"; // Mock login state
-        alert("Welcome back!");
-    });
+    // Auth (Mock)
+    if (elements.navLogin) {
+        elements.navLogin.addEventListener('click', () => {
+            elements.navLogin.innerText = "Sahil";
+            alert("Welcome back, Sahil!");
+        });
+    }
+
+    // Tool Actions
+    elements.btnGenerateSummary.addEventListener('click', generateSummary);
+    elements.btnGenerateFlashcards.addEventListener('click', generateFlashcards);
+    elements.btnStartQuiz.addEventListener('click', generateQuiz);
+
+    // Flashcard Flip
+    if (elements.flipCardBtn) elements.flipCardBtn.addEventListener('click', flipCard);
+    if (elements.prevCard) elements.prevCard.addEventListener('click', prevCard);
+    if (elements.nextCard) elements.nextCard.addEventListener('click', nextCard);
 
     // Tool Actions
     elements.summaryInput.addEventListener('input', () => {
@@ -177,16 +145,17 @@ async function generateSummary() {
         });
         const data = await res.json();
 
-        // Render
+        // Render in overlay
         const html = `
-            <h3 class="text-cyan-400 mb-4">${data.title}</h3>
-            <p class="mb-4 text-white">${data.core_idea}</p>
-            <ul class="list-disc pl-5 text-muted mb-4 space-y-2">
+            <h3 class="text-cyan-400 mb-2 font-bold text-lg">${data.title}</h3>
+            <p class="mb-4 text-white/90">${data.core_idea}</p>
+            <ul class="list-disc pl-5 text-muted space-y-1">
                 ${data.key_points.map(p => `<li>${p}</li>`).join('')}
             </ul>
         `;
-        elements.summaryOutputPanel.innerHTML = html;
+        elements.summaryContent.innerHTML = html;
         elements.summaryOutputPanel.classList.remove('hidden');
+        elements.summaryOutputPanel.classList.add('flex');
 
     } catch (e) {
         alert("Error generating summary");
@@ -212,41 +181,15 @@ async function generateFlashcards() {
         });
         const data = await res.json();
 
-        elements.flashcardsOutputPanel.innerHTML = '';
-        data.forEach(card => {
-            const el = document.createElement('div');
-            el.className = 'glass-card cursor-pointer hover:border-purple-500 transition-all';
-            el.innerHTML = `
-                <div class="text-center">
-                    <p class="text-purple-400 font-bold mb-2">Q</p>
-                    <p>${card.q}</p>
-                    <p class="text-xs text-muted mt-4">Click to flip</p>
-                </div>
-            `;
-            let flipped = false;
-            el.onclick = () => {
-                flipped = !flipped;
-                if (flipped) {
-                    el.innerHTML = `
-                        <div class="text-center fade-in">
-                             <p class="text-white font-bold mb-2">A</p>
-                             <p class="text-white">${card.a}</p>
-                        </div>
-                    `;
-                    el.style.borderColor = 'rgba(168, 85, 247, 0.8)';
-                } else {
-                    el.innerHTML = `
-                        <div class="text-center fade-in">
-                            <p class="text-purple-400 font-bold mb-2">Q</p>
-                            <p>${card.q}</p>
-                            <p class="text-xs text-muted mt-4">Click to flip</p>
-                        </div>
-                    `;
-                    el.style.borderColor = '';
-                }
-            };
-            elements.flashcardsOutputPanel.appendChild(el);
-        });
+        // NEW LOGIC: Setup unified viewer
+        currentFlashcards = data;
+        currentCardIndex = 0;
+
+        elements.flashcardInputContainer.classList.add('hidden');
+        elements.flashcardsOutputPanel.classList.remove('hidden');
+        elements.flashcardsOutputPanel.classList.add('flex');
+
+        renderCurrentCard();
 
     } catch (e) {
         alert("Error generating flashcards");
@@ -256,14 +199,84 @@ async function generateFlashcards() {
     }
 }
 
-async function generateQuiz() {
-    elements.quizModal.classList.add('hidden');
-    const text = elements.quizInput.value;
-    const btn = elements.btnOpenQuizModal; // The trigger button
+// Flashcard Navigation Logic
+let currentFlashcards = [];
+let currentCardIndex = 0;
+let isFlipped = false;
 
-    // Show loading state in output
-    elements.quizOutputPanel.innerHTML = '<div class="text-center text-muted">Generating Quiz...</div>';
+function renderCurrentCard() {
+    if (!elements.flashcardDisplay) return;
+
+    const card = currentFlashcards[currentCardIndex];
+    const total = currentFlashcards.length;
+
+    // Reset flip state
+    isFlipped = false;
+    updateCardFace(card);
+
+    // Update count
+    const counter = elements.flashcardsOutputPanel.querySelector('.text-mono');
+    if (counter) counter.innerText = `${currentCardIndex + 1} / ${total}`;
+}
+
+function updateCardFace(card) {
+    const display = elements.flashcardDisplay;
+    if (isFlipped) {
+        display.innerHTML = `
+            <div class="absolute top-4 right-4 text-purple-400 opacity-50"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M12 4v16"/></svg></div>
+            <div class="fade-in">
+                <h4 class="text-white font-bold mb-3 text-lg">Answer</h4>
+                <p class="text-lg text-purple-200">${card.a}</p>
+            </div>
+        `;
+        display.style.borderColor = 'rgba(192, 132, 252, 0.6)';
+    } else {
+        display.innerHTML = `
+            <div class="absolute top-4 right-4 text-purple-400 opacity-50"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M12 4v16"/></svg></div>
+            <div class="fade-in">
+                <h4 class="text-purple-300 font-bold mb-3 text-lg">Question</h4>
+                <p class="text-lg text-gray-300">${card.q}</p>
+            </div>
+        `;
+        display.style.borderColor = '';
+    }
+}
+
+function flipCard() {
+    if (currentFlashcards.length === 0) return;
+    isFlipped = !isFlipped;
+    updateCardFace(currentFlashcards[currentCardIndex]);
+}
+
+function nextCard() {
+    if (currentFlashcards.length === 0) return;
+    if (currentCardIndex < currentFlashcards.length - 1) {
+        currentCardIndex++;
+        renderCurrentCard();
+    }
+}
+
+function prevCard() {
+    if (currentFlashcards.length === 0) return;
+    if (currentCardIndex > 0) {
+        currentCardIndex--;
+        renderCurrentCard();
+    }
+}
+
+async function generateQuiz() {
+    const text = elements.quizInput.value;
+    if (!text) return alert("Please enter study material.");
+
+    const btn = elements.btnStartQuiz;
+    btn.innerText = "Generating...";
+    btn.disabled = true;
+
+    // Show loading state
+    elements.quizContent.innerHTML = '<div class="text-center text-muted p-4">Generating Quiz...</div>';
+    elements.quizInputContainer.classList.add('hidden');
     elements.quizOutputPanel.classList.remove('hidden');
+    elements.quizOutputPanel.classList.add('flex');
 
     try {
         const res = await fetch(`${API_URL}/practice`, {
@@ -271,35 +284,39 @@ async function generateQuiz() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 text,
-                type: quizType,
-                numQuestions: elements.numQuestions.value,
-                numMcq: elements.numMcq.value
+                type: quizType, // This var is global in script
+                numQuestions: elements.numQuestions.value || 5,
+                numMcq: elements.numMcq.value || 5
             })
         });
         const data = await res.json();
 
         let html = '<div class="space-y-6">';
 
-        if (data.questions) {
-            html += '<h3 class="text-blue-400">Questions</h3>';
+        if (data.questions && data.questions.length > 0) {
+            html += '<h3 class="text-blue-400 font-bold text-lg sticky top-0 bg-black/95 py-2 z-10">Questions</h3>';
             data.questions.forEach((q, i) => {
                 html += `
-                    <div class="glass-card text-left p-4">
-                        <p class="font-bold mb-2">${i + 1}. ${q}</p>
-                        <textarea class="w-full bg-black/30 rounded p-2 text-sm" placeholder="Answer..."></textarea>
+                    <div class="glass-card text-left p-4 border-blue-500/20">
+                        <p class="font-bold mb-2 text-white">${i + 1}. ${q}</p>
+                        <textarea class="w-full bg-black/30 rounded p-2 text-sm text-gray-300 border border-white/10 focus:border-blue-500/50 outline-none" placeholder="Your answer..."></textarea>
                     </div>
                 `;
             });
         }
 
-        if (data.mcq) {
-            html += '<h3 class="text-blue-400 mt-8">Multiple Choice</h3>';
+        if (data.mcq && data.mcq.length > 0) {
+            html += '<h3 class="text-blue-400 font-bold text-lg mt-8 sticky top-0 bg-black/95 py-2 z-10">Multiple Choice</h3>';
             data.mcq.forEach((m, i) => {
                 html += `
-                    <div class="glass-card text-left p-4">
-                        <p class="font-bold mb-2">${m.question}</p>
+                    <div class="glass-card text-left p-4 border-blue-500/20">
+                        <p class="font-bold mb-3 text-white">${m.question}</p>
                         <div class="space-y-2">
-                            ${m.options.map(opt => `<label class="block p-2 hover:bg-white/5 rounded cursor-pointer"><input type="radio" name="m${i}"> ${opt}</label>`).join('')}
+                            ${m.options.map(opt => `
+                                <label class="flex items-center gap-3 p-3 hover:bg-white/5 rounded-lg cursor-pointer border border-transparent hover:border-white/10 transition-all">
+                                    <input type="radio" name="m${i}" class="text-blue-500 bg-black/50 border-white/20"> 
+                                    <span class="text-sm text-gray-300">${opt}</span>
+                                </label>`).join('')}
                         </div>
                     </div>
                 `;
@@ -307,10 +324,21 @@ async function generateQuiz() {
         }
         html += '</div>';
 
-        elements.quizOutputPanel.innerHTML = html;
+        if (!data.questions?.length && !data.mcq?.length) {
+            html = '<div class="text-center text-muted">No questions generated. Try more text.</div>';
+        }
+
+        elements.quizContent.innerHTML = html;
 
     } catch (e) {
-        elements.quizOutputPanel.innerHTML = "Error generating quiz.";
+        elements.quizContent.innerHTML = '<div class="text-red-400 text-center">Error generating quiz. Please try again.</div>';
+        setTimeout(() => {
+            elements.quizOutputPanel.classList.add('hidden');
+            elements.quizInputContainer.classList.remove('hidden');
+        }, 2000);
+    } finally {
+        btn.innerText = "Start Practice";
+        btn.disabled = false;
     }
 }
 
