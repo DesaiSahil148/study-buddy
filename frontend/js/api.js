@@ -1,6 +1,6 @@
 import { showToast } from './utils.js';
 
-const API_URL = 'http://localhost:3000/api/v1'; // Adjust if deployed
+const API_URL = '/api/v1'; // Relative path for deployment compatibility
 
 export const generateSummary = async (text) => {
     try {
